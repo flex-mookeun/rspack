@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, fmt::Debug};
+use std::{cmp::Ordering, fmt::Debug, hash::Hasher};
 
 use itertools::Itertools;
 use rayon::prelude::*;
@@ -6,12 +6,13 @@ use rspack_collections::IdentifierSet;
 use rspack_error::Diagnostic;
 use rspack_hash::{RspackHash, RspackHashDigest, RspackHasher};
 use rspack_util::fx_hash::{FxIndexMap, FxIndexSet};
-use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
+use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet, FxHasher};
 use ustr::Ustr;
 
 use crate::{
   ChunkGraph, ChunkGroupByUkey, ChunkGroupOrderKey, ChunkGroupUkey, ChunkHashesArtifact, ChunkUkey,
-  Compilation, EntryOptions, Filename, RenderManifestEntry, RuntimeSpec, SourceType,
+  Compilation, EntryOptions, Filename, ModuleIdsArtifact, RenderManifestEntry, RuntimeSpec,
+  SourceType,
   chunk_graph_chunk::{ChunkId, IndexChunkIdMap},
   compare_chunk_group, sort_group_by_index,
 };
@@ -745,11 +746,16 @@ impl Chunk {
       .copied()
       .collect::<IdentifierSet>();
 
-    for module_identifier in compilation
+    let module_ids: &ModuleIdsArtifact = &compilation.module_ids_artifact;
+    let modules = compilation
       .build_chunk_graph_artifact
       .chunk_graph
-      .get_ordered_chunk_modules_identifier(&self.ukey)
-    {
+      .get_ordered_chunk_modules_identifier(&self.ukey);
+    // Digests are 16 bytes with the default xxhash64 + hex, and copying them
+    // at a fixed size avoids a `memcpy` call per module
+    let mut codegen_hashes = Vec::with_capacity(modules.len() * 16);
+    let mut ids_hasher = FxHasher::default();
+    for module_identifier in modules {
       if runtime_modules.contains(&module_identifier) {
         continue;
       }
@@ -757,9 +763,18 @@ impl Chunk {
         .code_generation_results
         .get_hash(&module_identifier, Some(&self.runtime))
       {
-        hash.hash(hasher);
+        let digest = hash.encoded().as_bytes();
+        match <&[u8; 16]>::try_from(digest) {
+          Ok(digest) => codegen_hashes.extend_from_slice(digest),
+          Err(_) => codegen_hashes.extend_from_slice(digest),
+        }
+        if let Some(module_id) = ChunkGraph::get_module_id(module_ids, module_identifier) {
+          ids_hasher.write_u64(module_id.precomputed_hash());
+        }
       }
     }
+    hasher.write(&codegen_hashes);
+    hasher.write(&ids_hasher.finish().to_le_bytes());
 
     for (runtime_module_identifier, _) in compilation
       .build_chunk_graph_artifact
