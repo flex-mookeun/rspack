@@ -168,6 +168,14 @@ pub struct AsyncDependenciesBlock {
 }
 
 impl AsyncDependenciesBlock {
+  /// Use the existing block identifier, relative to the compilation context.
+  pub fn runtime_id(&self, compilation: &Compilation) -> String {
+    rspack_util::identifier::make_paths_relative(
+      compilation.options.context.as_str(),
+      self.id.0.as_str(),
+    )
+  }
+
   /// modifier should be Dependency.span in most of time
   pub fn new(
     parent: ModuleIdentifier,
@@ -290,13 +298,18 @@ impl AsyncDependenciesBlock {
     runtime: Option<&RuntimeSpec>,
   ) {
     self.group_options.hash(hasher);
-    if let Some(chunk_group) = compilation
-      .build_chunk_graph_artifact
-      .chunk_graph
-      .get_block_chunk_group(
-        &self.id,
-        &compilation.build_chunk_graph_artifact.chunk_group_by_ukey,
-      )
+    if compilation.hot {
+      "hmr chunk groups".hash(hasher);
+      self.runtime_id(compilation).hash(hasher);
+    }
+    if (!compilation.hot || matches!(self.group_options, Some(GroupOptions::Entrypoint(_))))
+      && let Some(chunk_group) = compilation
+        .build_chunk_graph_artifact
+        .chunk_graph
+        .get_block_chunk_group(
+          &self.id,
+          &compilation.build_chunk_graph_artifact.chunk_group_by_ukey,
+        )
     {
       chunk_group.id(compilation).hash(hasher);
     }
