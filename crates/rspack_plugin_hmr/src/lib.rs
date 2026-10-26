@@ -2,7 +2,7 @@ mod hot_module_replacement;
 
 use std::{
   collections::hash_map,
-  sync::{LazyLock, Mutex},
+  sync::{Arc, LazyLock, Mutex},
 };
 
 use atomic_refcell::AtomicRefCell;
@@ -177,7 +177,8 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
     current_css_hashes.clone(),
   );
 
-  let Some(records) = compilation.records.take() else {
+  // Keep the baseline available to runtime modules while rendering hot-update chunks.
+  let Some(records) = compilation.records.as_ref().map(Arc::clone) else {
     return Ok(());
   };
   let CompilationRecords {
@@ -206,10 +207,10 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
 
   let mut updated_runtime_modules: IdentifierSet = Default::default();
   let mut updated_chunks: HashMap<ChunkUkey, HashSet<String>> = Default::default();
-  for (identifier, old_runtime_module_hash) in old_runtime_modules {
+  for (identifier, old_runtime_module) in old_runtime_modules {
     if let Some(new_runtime_module_hash) = compilation.runtime_modules_hash.get(identifier) {
       // updated
-      if new_runtime_module_hash != old_runtime_module_hash {
+      if new_runtime_module_hash != &old_runtime_module.hash {
         updated_runtime_modules.insert(*identifier);
       }
     }
