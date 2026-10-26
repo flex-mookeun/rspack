@@ -8,16 +8,17 @@
 - Bundle: modules_demo_js.chunk.CURRENT_HASH.js
 - Bundle: modules_demo_js_lazy-compilation-proxy.chunk.CURRENT_HASH.js
 - Bundle: modules_module_js_lazy-compilation-proxy.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 69
-- Update: main.LAST_HASH.hot-update.js, size: 470
-- Update: modules_demo_js_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1042
+- Manifest: main.LAST_HASH.hot-update.json, size: 883
+- Update: main.LAST_HASH.hot-update.js, size: 1040
+- Update: modules_demo_js.LAST_HASH.hot-update.js, size: 357
+- Update: modules_demo_js_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1142
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["main","modules_demo_js_lazy-compilation-proxy"],"r":[],"m":[]}
+{"c":["main","modules_demo_js","modules_demo_js_lazy-compilation-proxy"],"r":[],"m":[],"load":{"blocks":{"./modules|lazy|/^\\.\\/.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context/Users/bytedance/.codex/worktrees/66a4/rspack/tests/rspack-test/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/context/modules|./demo.js|modifier=./demo.js":["modules_demo_js_lazy-compilation-proxy"],"./modules|lazy|/^\\.\\/.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context/Users/bytedance/.codex/worktrees/66a4/rspack/tests/rspack-test/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/context/modules|./demo|modifier=./demo":["modules_demo_js_lazy-compilation-proxy"],"lazy-compilation-proxy|../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./modules/demo.js|dep=":["modules_demo_js"]}}}
 ```
 
 
@@ -30,6 +31,7 @@
 - ./generation.js
 
 #### Changed Runtime Modules
+- webpack/runtime/block_chunk_map
 - webpack/runtime/get_full_hash
 
 #### Changed Content
@@ -51,9 +53,52 @@ __webpack_require__.d(__webpack_exports__, {
 (() => {
 __webpack_require__.h = () => ("CURRENT_HASH")
 })();
+// webpack/runtime/block_chunk_map
+(() => {
+((blocks) => {
+	var map = __webpack_require__.hmrS_blockChunks;
+	
+	Object.keys(blocks).forEach((blockId) => {
+		if (blocks[blockId] === null) delete map[blockId];
+		else map[blockId] = blocks[blockId];
+	});
+	var installedBlocks = __webpack_require__.hmrS_blocks;
+	Object.keys(installedBlocks).forEach((id) => {
+		if (!map[id]) delete installedBlocks[id];
+	});
+})({"lazy-compilation-proxy|../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./modules/demo.js|dep=":["modules_demo_js"]});
+
+})();
 
 }
 );
+```
+
+
+
+### modules_demo_js.LAST_HASH.hot-update.js
+
+#### Changed Modules
+- ./modules/demo.js
+
+#### Changed Runtime Modules
+
+
+#### Changed Content
+```js
+"use strict";
+self["rspackHotUpdate"]("modules_demo_js", {
+"./modules/demo.js"(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  "default": () => (__rspack_default_export)
+});
+/* export default */ const __rspack_default_export = ("demo");
+
+
+},
+
+});
 ```
 
 
@@ -72,7 +117,7 @@ self["rspackHotUpdate"]("modules_demo_js_lazy-compilation-proxy", {
 "./modules/demo.js!lazy-compilation-proxy"(module, __unused_rspack_exports, __webpack_require__) {
 var client = __webpack_require__("../../../../../../../../packages/rspack/hot/lazy-compilation-web.js?http%3A%2F%2Flocalhost%3APORT%2F_rspack%2Flazy%2Ftrigger");
 var data = "lazy-compilation-proxy|<TEST_TOOLS_ROOT>/dist/helper/hot-update/loader.js!<TEST_ROOT>/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/context/modules/demo.js";
-        module.exports = __webpack_require__.e(/* import() */ "modules_demo_js").then(__webpack_require__.bind(__webpack_require__, "./modules/demo.js"));
+        module.exports = __webpack_require__.eg("lazy-compilation-proxy|../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./modules/demo.js|dep=").then(__webpack_require__.bind(__webpack_require__, "./modules/demo.js"));
         if (module.hot) {
           module.hot.accept();
           module.hot.accept("./modules/demo.js", function() { module.hot.invalidate(); });

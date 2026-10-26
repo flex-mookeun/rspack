@@ -2,8 +2,8 @@ use rspack_collections::IdentifierMap;
 use rustc_hash::FxHashMap as HashMap;
 
 use crate::{
-  AsyncDependenciesBlockIdentifierMap, ChunkGroupUkey, ChunkUkey, Compilation, GroupOptions,
-  ModuleIdentifier, RuntimeSpec,
+  AsyncDependenciesBlockIdentifierMap, ChunkGroupUkey, ChunkUkey, Compilation, DependenciesBlock,
+  GroupOptions, ModuleIdentifier, RuntimeSpec,
 };
 
 pub mod chunk_graph_chunk;
@@ -40,23 +40,30 @@ impl ChunkGraph {
   ) -> std::collections::BTreeMap<String, BlockChunkMapEntry> {
     let graph = &compilation.build_chunk_graph_artifact;
     let mg = compilation.get_module_graph();
-    mg.blocks()
-      .values()
-      // Async entries start their own runtime instead of loading through `eg`.
-      .filter(|block| !matches!(block.get_group_options(), Some(GroupOptions::Entrypoint(_))))
-      .filter_map(|block| {
-        if !self
-          .chunk_graph_module_by_module_identifier
-          .contains_key(block.parent())
-        {
-          return None;
-        }
-        if !self
-          .get_module_runtimes_iter(*block.parent(), &graph.chunk_by_ukey)
+    let mut blocks = std::collections::BTreeMap::new();
+    // Concatenated modules own their inner modules' blocks, but the blocks keep
+    // their original parent identifiers. Use the module actually in the chunks.
+    for &module in self.chunk_graph_module_by_module_identifier.keys() {
+      let Some(parent) = mg.module_by_identifier(&module) else {
+        continue;
+      };
+      if parent.get_blocks().is_empty()
+        || !self
+          .get_module_runtimes_iter(module, &graph.chunk_by_ukey)
           .any(|r| r.iter().any(|name| runtime.contains(name)))
-        {
-          return None;
+      {
+        continue;
+      }
+      let parent_id = Self::get_module_id(&compilation.module_ids_artifact, module)
+        .expect("should have block parent module id");
+      let mut queue = parent.get_blocks().to_vec();
+      while let Some(id) = queue.pop() {
+        let block = mg.block_by_id_expect(&id);
+        // Async entries start their own runtime instead of loading through `eg`.
+        if matches!(block.get_group_options(), Some(GroupOptions::Entrypoint(_))) {
+          continue;
         }
+        queue.extend_from_slice(block.get_blocks());
         let chunks = self
           .get_block_chunk_group(&block.identifier(), &graph.chunk_group_by_ukey)
           .map(|group| {
@@ -72,17 +79,16 @@ impl ChunkGraph {
               .collect()
           })
           .unwrap_or_default();
-        Some((
+        blocks.insert(
           block.runtime_id(compilation),
           BlockChunkMapEntry {
-            parent: Self::get_module_id(&compilation.module_ids_artifact, *block.parent())
-              .expect("should have block parent module id")
-              .clone(),
+            parent: parent_id.clone(),
             chunks,
           },
-        ))
-      })
-      .collect()
+        );
+      }
+    }
+    blocks
   }
 
   pub fn is_entry_module(&self, module_id: &ModuleIdentifier) -> bool {

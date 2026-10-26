@@ -6,7 +6,7 @@
 ## Asset Files
 - Bundle: main.mjs
 - Bundle: runtime.mjs
-- Manifest: runtime.LAST_HASH.hot-update.json.mjs, size: 75
+- Manifest: runtime.LAST_HASH.hot-update.json.mjs, size: 115
 - Update: main.LAST_HASH.hot-update.mjs, size: 608
 - Update: runtime.LAST_HASH.hot-update.mjs, size: 252
 
@@ -15,7 +15,7 @@
 ### runtime.LAST_HASH.hot-update.json.mjs
 
 ```json
-{"c":["main","runtime"],"r":[],"m":[],"css":{"c":["main"]}}
+{"c":["main","runtime"],"r":[],"m":[],"load":{"entries":{"main":["runtime"]}},"css":{"c":["main"]}}
 ```
 
 

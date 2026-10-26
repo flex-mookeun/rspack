@@ -6,7 +6,7 @@
 ## Asset Files
 - Bundle: bundle.js
 - Bundle: file_js.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 38
+- Manifest: main.LAST_HASH.hot-update.json, size: 199
 - Update: file_js.LAST_HASH.hot-update.js, size: 88
 - Update: main.LAST_HASH.hot-update.js, size: 181
 
@@ -15,7 +15,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["file_js","main"],"r":[],"m":[]}
+{"c":["file_js","main"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./parent-file.js|dep=esm|./file|loc=2:9-25":["file_js"]}}}
 ```
 
 

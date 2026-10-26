@@ -7,7 +7,7 @@
 ## Asset Files
 - Bundle: bundle.js
 - Bundle: style2_module_css.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 89
+- Manifest: main.LAST_HASH.hot-update.json, size: 428
 - Update: main.LAST_HASH.hot-update.js, size: 708
 - Update: style2_module_css.LAST_HASH.hot-update.js, size: 576
 
@@ -16,7 +16,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["main","style2_module_css"],"r":[],"m":[],"css":{"c":["main","style2_module_css"]}}
+{"c":["main","style2_module_css"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./style2.module.css|loc=16:18-47":["style2_module_css"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./style2.module.css|loc=6:22-51":["style2_module_css"]}},"css":{"c":["main","style2_module_css"]}}
 ```
 
 

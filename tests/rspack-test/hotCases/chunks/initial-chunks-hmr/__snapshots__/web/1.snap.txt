@@ -8,16 +8,17 @@
 - Bundle: async/initial_js.js
 - Bundle: lib.CURRENT_HASH.js
 - Bundle: main.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 41
+- Manifest: main.LAST_HASH.hot-update.json, size: 241
 - Update: initial_js.LAST_HASH.hot-update.js, size: 332
-- Update: main.LAST_HASH.hot-update.js, size: 25243
+- Update: lib.LAST_HASH.hot-update.js, size: 1375
+- Update: main.LAST_HASH.hot-update.js, size: 26832
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["initial_js","main"],"r":[],"m":[]}
+{"c":["initial_js","lib","main"],"r":[],"m":[],"load":{"entries":{"main":["lib"]},"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27":["lib","initial_js"]}}}
 ```
 
 
@@ -52,12 +53,40 @@ const value = "b";
 
 
 
+### lib.LAST_HASH.hot-update.js
+
+#### Changed Modules
+- ./node_modules/lib-js/b.js
+
+#### Changed Runtime Modules
+
+
+#### Changed Content
+```js
+"use strict";
+self["rspackHotUpdate"]("lib", {
+"./node_modules/lib-js/b.js"(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, {
+  b: () => (b)
+});
+const b = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+
+
+},
+
+});
+```
+
+
+
 ### main.LAST_HASH.hot-update.js
 
 #### Changed Modules
 - ./index.js
 
 #### Changed Runtime Modules
+- webpack/runtime/block_chunk_map
 - webpack/runtime/css_loading
 - webpack/runtime/get_full_hash
 - webpack/runtime/jsonp_chunk_loading
@@ -73,7 +102,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 it("should work if there are new initial chunks", async () => {
-	await Promise.all(/* import() */ [__webpack_require__.e("lib"), __webpack_require__.e("initial_js")]).then(__webpack_require__.bind(__webpack_require__, "./initial.js"));
+	await __webpack_require__.eg("../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27").then(__webpack_require__.bind(__webpack_require__, "./initial.js"));
 	expect(
 		globalThis.__INITIAL_CHUNK_HMR_CHUNKS__.some(([chunkIds]) =>
 			chunkIds.includes("lib")
@@ -123,6 +152,22 @@ __webpack_require__.O = (result, chunkIds, fn, priority) => {
 	}
 	return result;
 };
+
+})();
+// webpack/runtime/block_chunk_map
+(() => {
+((blocks) => {
+	var map = __webpack_require__.hmrS_blockChunks;
+	
+	Object.keys(blocks).forEach((blockId) => {
+		if (blocks[blockId] === null) delete map[blockId];
+		else map[blockId] = blocks[blockId];
+	});
+	var installedBlocks = __webpack_require__.hmrS_blocks;
+	Object.keys(installedBlocks).forEach((id) => {
+		if (!map[id]) delete installedBlocks[id];
+	});
+})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27":["lib","initial_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=5:16-35":null});
 
 })();
 // webpack/runtime/css_loading
@@ -493,6 +538,12 @@ function hotApplyHandler(options) {
 	for (var moduleId in hotCurrentUpdate) {
 		if (__webpack_require__.o(hotCurrentUpdate, moduleId)) {
 			var newModuleFactory = hotCurrentUpdate[moduleId];
+			// An array supplies an unchanged factory only if it is missing locally.
+			if (Array.isArray(newModuleFactory)) {
+				var cachedModule = __webpack_require__.c[moduleId];
+				if (__webpack_require__.o(__webpack_require__.m, moduleId) && (!cachedModule || !cachedModule.hot._selfInvalidated)) continue;
+				newModuleFactory = newModuleFactory[0];
+			}
 			var result = newModuleFactory ? getAffectedModuleEffects(moduleId) : {
 				type: "disposed",
 				moduleId: moduleId
@@ -815,7 +866,10 @@ __webpack_require__.hmrC.jsonp = function (
 	removedModules,
 	promises,
 	applyHandlers,
-	updatedModulesList
+	updatedModulesList,
+	_css,
+	_miniCss,
+	update
 ) {
 	applyHandlers.push(hotApplyHandler);
 	hotCurrentUpdateChunks = {};
@@ -836,6 +890,17 @@ __webpack_require__.hmrC.jsonp = function (
 			hotCurrentUpdateChunks[chunkId] = false;
 		}
 	});
+	if (update) {
+		update.entryIsLoaded = function (entryId) {
+			return __webpack_require__.o(jsonpInstalledChunks, entryId) && jsonpInstalledChunks[entryId] === 0;
+		};
+		update.chunkHandlers.push(function (chunkId, promises) {
+			if (__webpack_require__.o(hotCurrentUpdateChunks, chunkId) && !hotCurrentUpdateChunks[chunkId]) {
+				promises.push(jsonpLoadUpdateChunk(chunkId, updatedModulesList));
+				hotCurrentUpdateChunks[chunkId] = true;
+			}
+		});
+	}
 	if (__webpack_require__.f) {
 		__webpack_require__.f.jsonpHmr = function (chunkId, promises) {
 			if (

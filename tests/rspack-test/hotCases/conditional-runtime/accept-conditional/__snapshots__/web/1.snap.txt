@@ -9,7 +9,7 @@
 - Bundle: dep1_js-module_js.chunk.CURRENT_HASH.js
 - Bundle: shared.chunk.CURRENT_HASH.js
 - Manifest: [runtime of dep1_js-dep2_js-worker_js].LAST_HASH.hot-update.json, size: 49
-- Manifest: main.LAST_HASH.hot-update.json, size: 48
+- Manifest: main.LAST_HASH.hot-update.json, size: 216
 - Update: dep1_js-dep2_js-worker_js.LAST_HASH.hot-update.js, size: 486
 - Update: dep1_js-module_js.LAST_HASH.hot-update.js, size: 347
 - Update: main.LAST_HASH.hot-update.js, size: 181
@@ -27,7 +27,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["dep1_js-module_js","main"],"r":[],"m":[]}
+{"c":["dep1_js-module_js","main"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./module|loc=3:18-36":["dep1_js-module_js"]}}}
 ```
 
 

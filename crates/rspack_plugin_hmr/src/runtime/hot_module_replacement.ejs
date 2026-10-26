@@ -126,8 +126,12 @@
 	if (<%- weak(ENSURE_CHUNK_GROUP) %>) fn.eg = function (blockId, fetchPriority) {
 		var promises = [];
 		if (hotUpdateBlock) hotUpdateBlock(blockId, promises);
-		promises.push(<%- weak(ENSURE_CHUNK_GROUP) %>(blockId, fetchPriority));
-		return trackBlockingPromise(Promise.all(promises));
+		var promise = <%- weak(ENSURE_CHUNK_GROUP) %>(blockId, fetchPriority);
+		if (promises.length) {
+			promises.push(promise);
+			promise = Promise.all(promises);
+		}
+		return trackBlockingPromise(promise);
 	};
 
 	return fn;
