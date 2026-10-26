@@ -5,8 +5,8 @@ use rspack_collections::{Identifier, IdentifierHasher};
 use rspack_hash::{RspackHash, RspackHasher};
 
 use crate::{
-  BoxDependency, Compilation, Dependency, DependencyId, DependencyLocation, DependencyRef,
-  GroupOptions, ModuleIdentifier, RuntimeSpec,
+  BoxDependency, ChunkGraph, Compilation, Dependency, DependencyId, DependencyLocation,
+  DependencyRef, GroupOptions, ModuleIdentifier, RuntimeSpec,
 };
 
 pub trait DependenciesBlock {
@@ -168,8 +168,15 @@ pub struct AsyncDependenciesBlock {
 }
 
 impl AsyncDependenciesBlock {
-  /// Use the existing block identifier, relative to the compilation context.
+  /// Use the module ID for an anonymous block, otherwise keep the block identifier.
   pub fn runtime_id(&self, compilation: &Compilation) -> String {
+    // Generated modules such as lazy compilation proxies have one anonymous block.
+    // Its parent module ID already distinguishes loaders, types and layers.
+    if self.id.0.as_str().get(self.parent.len()..) == Some("|dep=")
+      && let Some(id) = ChunkGraph::get_module_id(&compilation.module_ids_artifact, self.parent)
+    {
+      return id.to_string();
+    }
     rspack_util::identifier::make_paths_relative(
       compilation.options.context.as_str(),
       self.id.0.as_str(),

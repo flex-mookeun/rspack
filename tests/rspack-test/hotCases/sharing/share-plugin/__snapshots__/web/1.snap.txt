@@ -7,7 +7,7 @@
 - Bundle: bundle.js
 - Bundle: common_js_2.chunk.CURRENT_HASH.js
 - Manifest: main.LAST_HASH.hot-update.json, size: 278
-- Update: main.LAST_HASH.hot-update.js, size: 42806
+- Update: main.LAST_HASH.hot-update.js, size: 42584
 - Update: webpack_sharing_consume_default_common2_common_2.LAST_HASH.hot-update.js, size: 94
 
 ## Manifest
@@ -69,13 +69,13 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|common2|loc=3:31-48":["webpack_sharing_consume_default_common2_common_2"],"consume shared module (default) common2@1.1.1 (strict) (fallback: <TEST_ROOT>/js/temp/hot-snapshot/hotSnapshotCases-hotCases/sharing/share-plugin/common.js)|dep=":["common_js_2"]});
+})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|common2|loc=3:31-48":["webpack_sharing_consume_default_common2_common_2"],"webpack/sharing/consume/default/common2/./common?2":["common_js_2"]});
 
 })();
 // webpack/runtime/consumes_loading
 (() => {
 
-__webpack_require__.consumesLoadingData = { chunkMapping: {"main":["webpack/sharing/consume/default/common/./common?1"],"webpack_sharing_consume_default_common2_common_2":["webpack/sharing/consume/default/common2/./common?2"]}, moduleIdToConsumeDataMapping: {"webpack/sharing/consume/default/common/./common?1": { shareScope: "default", shareKey: "common", import: "./common?1", requiredVersion: "1.1.1", strictVersion: true, singleton: false, eager: true, fallback: () => (() => (__webpack_require__("./common.js?1"))), treeShakingMode: null }, "webpack/sharing/consume/default/common2/./common?2": { shareScope: "default", shareKey: "common2", import: "./common?2", requiredVersion: "1.1.1", strictVersion: true, singleton: false, eager: false, fallback: () => (__webpack_require__.eg("consume shared module (default) common2@1.1.1 (strict) (fallback: <TEST_ROOT>/js/temp/hot-snapshot/hotSnapshotCases-hotCases/sharing/share-plugin/common.js)|dep=").then(() => (() => (__webpack_require__("./common.js?2"))))), treeShakingMode: null }}, initialConsumes: ["webpack/sharing/consume/default/common/./common?1"] };
+__webpack_require__.consumesLoadingData = { chunkMapping: {"main":["webpack/sharing/consume/default/common/./common?1"],"webpack_sharing_consume_default_common2_common_2":["webpack/sharing/consume/default/common2/./common?2"]}, moduleIdToConsumeDataMapping: {"webpack/sharing/consume/default/common/./common?1": { shareScope: "default", shareKey: "common", import: "./common?1", requiredVersion: "1.1.1", strictVersion: true, singleton: false, eager: true, fallback: () => (() => (__webpack_require__("./common.js?1"))), treeShakingMode: null }, "webpack/sharing/consume/default/common2/./common?2": { shareScope: "default", shareKey: "common2", import: "./common?2", requiredVersion: "1.1.1", strictVersion: true, singleton: false, eager: false, fallback: () => (__webpack_require__.eg("webpack/sharing/consume/default/common2/./common?2").then(() => (() => (__webpack_require__("./common.js?2"))))), treeShakingMode: null }}, initialConsumes: ["webpack/sharing/consume/default/common/./common?1"] };
 var splitAndConvert = function(str) {
   return str.split(".").map(function(item) {
     return +item == item ? +item : item;

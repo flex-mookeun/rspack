@@ -9,17 +9,17 @@
 - Bundle: modules_demo_js_lazy-compilation-proxy.chunk.CURRENT_HASH.js
 - Bundle: modules_module_js.chunk.CURRENT_HASH.js
 - Bundle: modules_module_js_lazy-compilation-proxy.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 903
-- Update: main.LAST_HASH.hot-update.js, size: 1044
+- Manifest: main.LAST_HASH.hot-update.json, size: 548
+- Update: main.LAST_HASH.hot-update.js, size: 955
 - Update: modules_module_js.LAST_HASH.hot-update.js, size: 363
-- Update: modules_module_js_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1154
+- Update: modules_module_js_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1065
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["main","modules_module_js","modules_module_js_lazy-compilation-proxy"],"r":[],"m":[],"load":{"blocks":{"./modules|lazy|/^\\.\\/.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context/Users/bytedance/.codex/worktrees/66a4/rspack/tests/rspack-test/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/context/modules|./module.js|modifier=./module.js":["modules_module_js_lazy-compilation-proxy"],"./modules|lazy|/^\\.\\/.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context/Users/bytedance/.codex/worktrees/66a4/rspack/tests/rspack-test/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/context/modules|./module|modifier=./module":["modules_module_js_lazy-compilation-proxy"],"lazy-compilation-proxy|../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./modules/module.js|dep=":["modules_module_js"]}}}
+{"c":["main","modules_module_js","modules_module_js_lazy-compilation-proxy"],"r":[],"m":[],"load":{"blocks":{"./modules/module.js!lazy-compilation-proxy":["modules_module_js"],"./modules|lazy|/^\\.\\/.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./modules|./module.js|modifier=./module.js":["modules_module_js_lazy-compilation-proxy"],"./modules|lazy|/^\\.\\/.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./modules|./module|modifier=./module":["modules_module_js_lazy-compilation-proxy"]}}}
 ```
 
 
@@ -67,7 +67,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"lazy-compilation-proxy|../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./modules/module.js|dep=":["modules_module_js"]});
+})({"./modules/module.js!lazy-compilation-proxy":["modules_module_js"]});
 
 })();
 
@@ -118,7 +118,7 @@ self["rspackHotUpdate"]("modules_module_js_lazy-compilation-proxy", {
 "./modules/module.js!lazy-compilation-proxy"(module, __unused_rspack_exports, __webpack_require__) {
 var client = __webpack_require__("../../../../../../../../packages/rspack/hot/lazy-compilation-web.js?http%3A%2F%2Flocalhost%3APORT%2F_rspack%2Flazy%2Ftrigger");
 var data = "lazy-compilation-proxy|<TEST_TOOLS_ROOT>/dist/helper/hot-update/loader.js!<TEST_ROOT>/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/context/modules/module.js";
-        module.exports = __webpack_require__.eg("lazy-compilation-proxy|../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./modules/module.js|dep=").then(__webpack_require__.bind(__webpack_require__, "./modules/module.js"));
+        module.exports = __webpack_require__.eg("./modules/module.js!lazy-compilation-proxy").then(__webpack_require__.bind(__webpack_require__, "./modules/module.js"));
         if (module.hot) {
           module.hot.accept();
           module.hot.accept("./modules/module.js", function() { module.hot.invalidate(); });
