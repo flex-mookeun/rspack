@@ -11,6 +11,15 @@ pub mod chunk_graph_module;
 pub use chunk_graph_chunk::{ChunkGraphChunk, ChunkIdMap, ChunkSizeOptions, IndexChunkIdMap};
 pub use chunk_graph_module::{ChunkGraphModule, ModuleId, ModuleIdMap};
 
+#[derive(Debug, serde::Serialize)]
+#[serde(transparent)]
+pub struct BlockChunkMapEntry {
+  // HMR uses the recorded parent to check membership in the previous runtime.
+  #[serde(skip)]
+  pub parent: ModuleId,
+  pub chunks: Vec<chunk_graph_chunk::ChunkId>,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct ChunkGraph {
   /// If a module is imported dynamically, it will be assigned to a unique ChunkGroup
@@ -28,7 +37,7 @@ impl ChunkGraph {
     &self,
     compilation: &Compilation,
     runtime: &RuntimeSpec,
-  ) -> std::collections::BTreeMap<String, Vec<chunk_graph_chunk::ChunkId>> {
+  ) -> std::collections::BTreeMap<String, BlockChunkMapEntry> {
     let graph = &compilation.build_chunk_graph_artifact;
     let mg = compilation.get_module_graph();
     mg.blocks()
@@ -63,7 +72,15 @@ impl ChunkGraph {
               .collect()
           })
           .unwrap_or_default();
-        Some((block.runtime_id(compilation), chunks))
+        Some((
+          block.runtime_id(compilation),
+          BlockChunkMapEntry {
+            parent: Self::get_module_id(&compilation.module_ids_artifact, *block.parent())
+              .expect("should have block parent module id")
+              .clone(),
+            chunks,
+          },
+        ))
       })
       .collect()
   }

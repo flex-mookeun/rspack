@@ -4,13 +4,13 @@ use std::{
 };
 
 use rspack_core::{
-  Compilation, RuntimeGlobals, RuntimeModule, RuntimeModuleGenerateContext,
+  BlockChunkMapEntry, Compilation, RuntimeGlobals, RuntimeModule, RuntimeModuleGenerateContext,
   RuntimeModuleRuntimeRequirements, RuntimeModuleStage, RuntimeModuleUpdateData, RuntimeTemplate,
-  chunk_graph_chunk::ChunkId, impl_runtime_module,
+  impl_runtime_module,
 };
 
 #[derive(Debug)]
-struct BlockChunkMapData(BTreeMap<String, Vec<ChunkId>>);
+pub struct BlockChunkMapData(pub BTreeMap<String, BlockChunkMapEntry>);
 
 impl RuntimeModuleUpdateData for BlockChunkMapData {}
 
@@ -88,8 +88,13 @@ impl RuntimeModule for BlockChunkMapRuntimeModule {
     let blocks = &self.data(context.compilation).0;
     let changes = blocks
       .iter()
-      .filter(|(id, chunks)| previous.0.get(*id) != Some(*chunks))
-      .map(|(id, chunks)| (id.as_str(), Some(chunks)))
+      .filter(|(id, entry)| {
+        previous
+          .0
+          .get(*id)
+          .is_none_or(|old| old.chunks != entry.chunks)
+      })
+      .map(|(id, entry)| (id.as_str(), Some(&entry.chunks)))
       .chain(
         previous
           .0

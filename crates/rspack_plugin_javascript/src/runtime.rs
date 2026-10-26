@@ -465,6 +465,7 @@ pub(crate) async fn render_runtime_module_sources(
               .records
               .as_ref()
               .and_then(|records| records.runtime_modules.get(identifier))
+              .filter(|record| !record.has_custom_source)
               .and_then(|record| record.update_data.as_deref())
           } else {
             None

@@ -104,6 +104,12 @@
 	for (var moduleId in hotCurrentUpdate) {
 		if (<%- HAS_OWN_PROPERTY %>(hotCurrentUpdate, moduleId)) {
 			var newModuleFactory = hotCurrentUpdate[moduleId];
+			// An array supplies an unchanged factory only if it is missing locally.
+			if (Array.isArray(newModuleFactory)) {
+				var cachedModule = <%- MODULE_CACHE %>[moduleId];
+				if (<%- HAS_OWN_PROPERTY %>(<%- MODULE_FACTORIES %>, moduleId) && (!cachedModule || !cachedModule.hot._selfInvalidated)) continue;
+				newModuleFactory = newModuleFactory[0];
+			}
 			var result = newModuleFactory ? getAffectedModuleEffects(moduleId) : {
 				type: "disposed",
 				moduleId: moduleId
@@ -428,7 +434,10 @@
 	removedModules,
 	promises,
 	applyHandlers,
-	updatedModulesList
+	updatedModulesList,
+	_css,
+	_miniCss,
+	update
 ) {
 	applyHandlers.push(hotApplyHandler);
 	hotCurrentUpdateChunks = {};
@@ -449,6 +458,17 @@
 			hotCurrentUpdateChunks[chunkId] = false;
 		}
 	});
+	if (update) {
+		update.entryIsLoaded = function (entryId) {
+			return <%- HAS_OWN_PROPERTY %>(<%- _installed_chunks %>, entryId) && <%- _installed_chunks %>[entryId] === <%- _loaded_chunk_state %>;
+		};
+		update.chunkHandlers.push(function (chunkId, promises) {
+			if (<%- HAS_OWN_PROPERTY %>(hotCurrentUpdateChunks, chunkId) && !hotCurrentUpdateChunks[chunkId]) {
+				promises.push(<%- _load_update_chunk %>(chunkId, updatedModulesList));
+				hotCurrentUpdateChunks[chunkId] = true;
+			}
+		});
+	}
 	if (<%- weak(ENSURE_CHUNK_HANDLERS) %>) {
 		<%- weak(ENSURE_CHUNK_HANDLERS) %>.<%- _loading_method %>Hmr = function (chunkId, promises) {
 			if (

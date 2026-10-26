@@ -25,13 +25,14 @@ pub struct RuntimeModuleGenerateContext<'a> {
 }
 
 /// Immutable data retained by HMR records for the next runtime update.
-/// Only the runtime module that produced this data interprets it.
+/// The producing runtime module defines the representation of this data.
 pub trait RuntimeModuleUpdateData: Debug + AsAny + Send + Sync {}
 
 #[derive(Debug)]
 pub struct RuntimeModuleRecord {
   pub hash: RspackHashDigest,
   pub update_data: Option<Arc<dyn RuntimeModuleUpdateData>>,
+  pub has_custom_source: bool,
 }
 
 pub fn runtime_module_owned_define_fields(
@@ -267,7 +268,7 @@ pub trait RuntimeModule:
     context: &RuntimeModuleGenerateContext<'_>,
   ) -> rspack_error::Result<String>;
 
-  /// Records data matching the full generated source, independently of codegen caches.
+  /// Records built-in state independently of codegen caches and custom source overrides.
   fn get_update_data(
     &self,
     _compilation: &Compilation,

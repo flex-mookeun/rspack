@@ -1,7 +1,7 @@
 mod hot_module_replacement;
 
 use std::{
-  collections::hash_map,
+  collections::{BTreeMap, hash_map},
   sync::{Arc, LazyLock, Mutex},
 };
 
@@ -9,27 +9,33 @@ use atomic_refcell::AtomicRefCell;
 use hot_module_replacement::HotModuleReplacementRuntimeModule;
 use rspack_collections::IdentifierSet;
 use rspack_core::{
-  AssetInfo, Chunk, ChunkGraph, ChunkKind, ChunkUkey, Compilation,
+  AssetInfo, Chunk, ChunkGraph, ChunkInitFragments, ChunkKind, ChunkUkey, Compilation,
   CompilationAdditionalTreeRuntimeRequirements, CompilationAsset, CompilationContentHash,
   CompilationParams, CompilationProcessAssets, CompilationRecords, CompilerCompilation,
-  DependencyType, LoaderContext, ModuleId, ModuleIdentifier, ModuleType, NormalModuleFactoryParser,
-  NormalModuleLoader, ParserAndGenerator, ParserOptions, PathData, Plugin, RunnerContext,
-  RuntimeGlobals, RuntimeModule, RuntimeModuleExt, RuntimeSpec, SourceType,
+  DependencyType, LoaderContext, Module, ModuleId, ModuleIdentifier, ModuleType,
+  NormalModuleFactoryParser, NormalModuleLoader, ParserAndGenerator, ParserOptions, PathData,
+  Plugin, RunnerContext, RuntimeCodeTemplate, RuntimeGlobals, RuntimeModule, RuntimeModuleExt,
+  RuntimeSpec, SourceType,
   chunk_graph_chunk::{ChunkId, ChunkIdMap, ChunkIdSet},
+  chunk_graph_module::ModuleIdSet,
   incremental::{IncrementalPasses, Mutation},
-  rspack_sources::{RawStringSource, SourceExt},
+  rspack_sources::{RawStringSource, ReplaceSource, SourceExt},
 };
 use rspack_error::{Diagnostic, Result};
 use rspack_hash::{RspackHashDigest, RspackHasher};
 use rspack_hook::{plugin, plugin_hook};
 use rspack_plugin_css::parser_and_generator::CssParserAndGenerator;
 use rspack_plugin_javascript::{
+  JavascriptModulesRenderModuleContainer, JsPlugin, RenderSource,
   hot_module_replacement_plugin::{
     ImportMetaHotReplacementParserPlugin, ModuleHotReplacementParserPlugin,
   },
   parser_and_generator::JavaScriptParserAndGenerator,
 };
+use rspack_plugin_runtime::BlockChunkMapData;
 use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
+
+type BlockChunks = BTreeMap<String, Vec<ChunkId>>;
 
 /// Safety with [atomic_refcell::AtomicRefCell]:
 ///
@@ -37,6 +43,8 @@ use rustc_hash::{FxHashMap as HashMap, FxHashSet as HashSet};
 /// runs serially (each compiler owns its plugin instance and drives one
 /// compilation at a time). The content_hash tap runs concurrently across
 /// chunks, so `collected_css_hashes` uses a `Mutex` instead.
+/// `hot_update_module_additions` is written before and after rendering each
+/// hot-update chunk; parallel render hooks only borrow it immutably.
 #[plugin]
 #[derive(Debug)]
 pub struct HotModuleReplacementPlugin {
@@ -49,11 +57,13 @@ pub struct HotModuleReplacementPlugin {
   // the previous sealed build's per-chunk css digests: the old side of the
   // diff, advanced on every build like `CompilationRecords`
   previous_css_hashes: AtomicRefCell<ChunkIdMap<ChunkCssHashes>>,
+  // Unchanged factories included only to supply missing dependencies during HMR.
+  hot_update_module_additions: AtomicRefCell<Option<(ChunkUkey, IdentifierSet)>>,
 }
 
 impl Default for HotModuleReplacementPlugin {
   fn default() -> Self {
-    Self::new_inner(Default::default(), Default::default())
+    Self::new_inner(Default::default(), Default::default(), Default::default())
   }
 }
 
@@ -79,6 +89,7 @@ async fn compilation(
   compilation: &mut Compilation,
   params: &mut CompilationParams,
 ) -> Result<()> {
+  compilation.hot = true;
   compilation.set_dependency_factory(
     DependencyType::ImportMetaHotAccept,
     params.normal_module_factory.clone(),
@@ -95,6 +106,50 @@ async fn compilation(
     DependencyType::ModuleHotDecline,
     params.normal_module_factory.clone(),
   );
+  JsPlugin::get_compilation_hooks_mut(compilation.id())
+    .write()
+    .await
+    .render_module_container
+    .tap(render_module_container::new(self));
+  Ok(())
+}
+
+#[plugin_hook(JavascriptModulesRenderModuleContainer for HotModuleReplacementPlugin, stage = -100, tracing = false)]
+async fn render_module_container(
+  &self,
+  compilation: &Compilation,
+  chunk_ukey: &ChunkUkey,
+  module: &dyn Module,
+  source: &mut RenderSource,
+  _init_fragments: &mut ChunkInitFragments,
+  _runtime_template: &RuntimeCodeTemplate,
+) -> Result<()> {
+  if !self
+    .hot_update_module_additions
+    .borrow()
+    .as_ref()
+    .is_some_and(|(chunk, modules)| chunk == chunk_ukey && modules.contains(&module.identifier()))
+  {
+    return Ok(());
+  }
+
+  // The container omits the module ID and ends with `,\n`. Wrap the factory
+  // before other container hooks run, preserving its source map.
+  let end = (source.source.size() - 2) as u32;
+  let mut replacement = ReplaceSource::new(source.source.clone());
+  if compilation
+    .options
+    .output
+    .environment
+    .supports_method_shorthand()
+  {
+    replacement.insert_static(0, ": [(function ", None);
+    replacement.insert_static(end, ")]", None);
+  } else {
+    replacement.insert_static(2, "[", None);
+    replacement.insert_static(end, "]", None);
+  }
+  source.source = replacement.boxed();
   Ok(())
 }
 
@@ -176,13 +231,13 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
     &mut *self.previous_css_hashes.borrow_mut(),
     current_css_hashes.clone(),
   );
-
   // Keep the baseline available to runtime modules while rendering hot-update chunks.
   let Some(records) = compilation.records.as_ref().map(Arc::clone) else {
     return Ok(());
   };
   let CompilationRecords {
     chunks: old_chunks,
+    entries: old_entries,
     runtimes: all_old_runtime,
     modules: old_all_modules,
     runtime_modules: old_runtime_modules,
@@ -251,14 +306,87 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
         .collect::<HashSet<_>>()
     });
 
-  for (chunk_id, (old_runtime, old_module_ids)) in old_chunks {
+  let current_entries = CompilationRecords::record_entries(compilation);
+  let current_blocks = all_old_runtime
+    .iter()
+    .map(|&runtime| {
+      let spec = [runtime].into_iter().collect();
+      (
+        runtime,
+        compilation
+          .build_chunk_graph_artifact
+          .chunk_graph
+          .get_block_chunks(compilation, &spec),
+      )
+    })
+    .collect::<HashMap<_, _>>();
+  let old_blocks = old_runtime_modules
+    .values()
+    .filter_map(|record| {
+      record
+        .update_data
+        .as_deref()?
+        .as_any()
+        .downcast_ref::<BlockChunkMapData>()
+    })
+    .flat_map(|data| data.0.iter().map(|(id, entry)| (id.as_str(), entry)))
+    .collect::<HashMap<_, _>>();
+
+  // Keep the old loading groups for each chunk. Module records already index
+  // their previous chunks, so missing dependencies can be checked during diffing.
+  let mut previous_chunks: ChunkIdMap<HashSet<&[ChunkId]>> = Default::default();
+  let mut collect_previous_chunks = |chunks: &[ChunkId], previous| {
+    for id in chunks {
+      previous_chunks
+        .entry(id.clone())
+        .or_default()
+        .insert(previous);
+    }
+  };
+  for (name, (_, chunks)) in &current_entries {
+    if let Some((_, previous)) = old_entries.get(name) {
+      collect_previous_chunks(chunks, previous.as_slice());
+    }
+  }
+  for (runtime, blocks) in &current_blocks {
+    for (block_id, entry) in blocks {
+      if let Some(previous) = old_blocks.get(block_id.as_str())
+        && old_all_modules.get(&previous.parent).is_some_and(|chunks| {
+          chunks.keys().any(|id| {
+            old_chunks
+              .get(id)
+              .is_some_and(|(runtimes, _)| runtimes.contains(runtime))
+          })
+        })
+      {
+        collect_previous_chunks(&entry.chunks, previous.chunks.as_slice());
+      }
+    }
+  }
+  // New chunks also get incremental hot-update assets. Their download is
+  // selected by `load`, not by pretending their complete contents are installed.
+  let empty_runtime = RuntimeSpec::default();
+  let empty_module_ids = ModuleIdSet::default();
+  for chunk_id in old_chunks.keys().chain(
+    current_chunk_ukeys
+      .keys()
+      .filter(|id| !old_chunks.contains_key(*id)),
+  ) {
+    let (old_runtime, old_module_ids) = old_chunks
+      .get(chunk_id)
+      .map_or((&empty_runtime, &empty_module_ids), |(runtime, modules)| {
+        (runtime, modules)
+      });
+    let previous_groups = previous_chunks.get(chunk_id);
+    let was_in_all_groups =
+      previous_groups.is_none_or(|groups| groups.iter().all(|chunks| chunks.contains(chunk_id)));
+    let mut install_only = IdentifierSet::default();
     let mut new_modules = vec![];
     let mut new_runtime_modules = vec![];
-    let chunk_id = chunk_id.clone();
     let new_runtime: RuntimeSpec;
     let removed_from_runtime: RuntimeSpec;
 
-    let current_chunk_ukey = current_chunk_ukeys.get(&chunk_id).copied();
+    let current_chunk_ukey = current_chunk_ukeys.get(chunk_id).copied();
     let current_chunk = current_chunk_ukey.and_then(|ukey| {
       compilation
         .build_chunk_graph_artifact
@@ -281,6 +409,7 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
         && changed_chunks
           .as_ref()
           .is_some_and(|chunks| !chunks.contains(&current_chunk.ukey()))
+        && was_in_all_groups
       {
         continue;
       }
@@ -295,11 +424,39 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
           let Some(old_module_hashes) = old_all_modules.get(module_id) else {
             return Some(module);
           };
-          let old_hash = old_module_hashes.get(&chunk_id);
           let new_hash = compilation
             .code_generation_results
             .get_hash(&module, Some(current_chunk.runtime()));
-          if old_hash != new_hash {
+          // Overlapping runtimes can have different factories. Keep the same-chunk
+          // baseline when its runtime is unchanged, and search other chunks only otherwise.
+          let unchanged = if let Some(old_hash) = old_module_hashes
+            .get(chunk_id)
+            .filter(|_| old_runtime == current_chunk.runtime())
+          {
+            Some(old_hash) == new_hash
+          } else {
+            let mut previous = old_module_hashes
+              .iter()
+              .filter(|(id, _)| {
+                old_chunks.get(*id).is_some_and(|(runtimes, _)| {
+                  runtimes.iter().any(|runtime| new_runtime.contains(runtime))
+                })
+              })
+              .peekable();
+            previous.peek().is_some() && previous.all(|(_, hash)| Some(hash) == new_hash)
+          };
+          if !unchanged {
+            return Some(module);
+          }
+          if was_in_all_groups && old_module_hashes.contains_key(chunk_id) {
+            return None;
+          }
+          if previous_groups.is_some_and(|groups| {
+            groups
+              .iter()
+              .any(|chunks| chunks.iter().all(|id| !old_module_hashes.contains_key(id)))
+          }) {
+            install_only.insert(module);
             return Some(module);
           }
           None
@@ -320,8 +477,8 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
       new_runtime = old_runtime.clone();
     }
 
-    let old_css_hashes = old_chunk_css_hashes.get(&chunk_id);
-    let new_css_hashes = current_chunk.and_then(|_| current_css_hashes.get(&chunk_id));
+    let old_css_hashes = old_chunk_css_hashes.get(chunk_id);
+    let new_css_hashes = current_chunk.and_then(|_| current_css_hashes.get(chunk_id));
     let css_update = CssUpdate::new(
       old_css_hashes.and_then(|hashes| hashes.css.as_ref()),
       new_css_hashes.and_then(|hashes| hashes.css.as_ref()),
@@ -382,7 +539,7 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
       let old_hashes = old_all_modules
         .get(old_module_id)
         .expect("should have module");
-      let old_hash = old_hashes.get(&chunk_id);
+      let old_hash = old_hashes.get(chunk_id);
       let runtimes = compilation
         .build_chunk_graph_artifact
         .chunk_graph
@@ -399,6 +556,10 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
         }
       } else {
         for removed in removed_from_runtime.iter() {
+          // Leaving this chunk does not remove the module from the whole runtime.
+          if runtimes.values().any(|runtime| runtime.contains(removed)) {
+            continue;
+          }
           if let Some(content) = hot_update_main_content_by_runtime.get_mut(removed) {
             content.removed_modules.insert(old_module_id.clone());
           }
@@ -459,12 +620,15 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
 
       let mut manifest = Vec::new();
       let mut diagnostics = Vec::new();
-      compilation
+      *self.hot_update_module_additions.borrow_mut() = Some((ukey, install_only));
+      let render_result = compilation
         .plugin_driver
         .compilation_hooks
         .render_manifest
         .call(compilation, &ukey, &mut manifest, &mut diagnostics)
-        .await?;
+        .await;
+      self.hot_update_module_additions.borrow_mut().take();
+      render_result?;
 
       // Manually clean up ChunkGraph and chunks
       for module_identifier in new_modules {
@@ -535,6 +699,46 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
     }
   }
 
+  // Repeat the conditions for this update's candidates. A previous delta does
+  // not mark the full chunk installed, so later edits need the same selection.
+  for (name, (entry_id, chunks)) in &current_entries {
+    let Some((old_entry_id, _)) = old_entries.get(name) else {
+      continue;
+    };
+    let Some(ukey) = current_chunk_ukeys.get(entry_id) else {
+      continue;
+    };
+    let entry = compilation
+      .build_chunk_graph_artifact
+      .chunk_by_ukey
+      .expect_get(ukey);
+    for runtime in entry.runtime().iter() {
+      if let Some(info) = hot_update_main_content_by_runtime.get_mut(runtime) {
+        let needed: Vec<_> = chunks
+          .iter()
+          .filter(|id| *id != old_entry_id && info.updated_chunk_ids.contains(*id))
+          .cloned()
+          .collect();
+        if !needed.is_empty() {
+          info.load_entries.insert(old_entry_id.clone(), needed);
+        }
+      }
+    }
+  }
+  for (runtime, info) in &mut hot_update_main_content_by_runtime {
+    for (block_id, entry) in &current_blocks[runtime] {
+      let needed: Vec<_> = entry
+        .chunks
+        .iter()
+        .filter(|id| info.updated_chunk_ids.contains(*id))
+        .cloned()
+        .collect();
+      if !needed.is_empty() {
+        info.load_blocks.insert(block_id.clone(), needed);
+      }
+    }
+  }
+
   // update chunk files
   for (chunk_ukey, files) in updated_chunks {
     let chunk = compilation
@@ -580,6 +784,8 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
         old_content
           .mini_css_removed_chunk_ids
           .extend(content.mini_css_removed_chunk_ids);
+        old_content.load_entries.extend(content.load_entries);
+        old_content.load_blocks.extend(content.load_blocks);
         compilation.push_diagnostic(Diagnostic::warn(
           "HotModuleReplacementPlugin".to_string(),
           r#"The configured output.hotUpdateMainFilename doesn't lead to unique filenames per runtime and HMR update differs between runtimes.
@@ -606,6 +812,19 @@ To fix this, make sure to include [runtime] in the output.hotUpdateMainFilename 
       "r": r,
       "m": m,
     });
+    let mut load = serde_json::Map::new();
+    if !content.load_entries.is_empty() {
+      load.insert(
+        "entries".to_string(),
+        serde_json::json!(content.load_entries),
+      );
+    }
+    if !content.load_blocks.is_empty() {
+      load.insert("blocks".to_string(), serde_json::json!(content.load_blocks));
+    }
+    if !load.is_empty() {
+      manifest_json["load"] = load.into();
+    }
     if let Some(css) =
       css_manifest_json(content.css_updated_chunk_ids, content.css_removed_chunk_ids)
     {
@@ -725,6 +944,8 @@ struct HotUpdateContent {
   css_removed_chunk_ids: ChunkIdSet,
   mini_css_updated_chunk_ids: ChunkIdSet,
   mini_css_removed_chunk_ids: ChunkIdSet,
+  load_entries: ChunkIdMap<Vec<ChunkId>>,
+  load_blocks: BlockChunks,
 }
 
 #[derive(Clone, Copy, PartialEq)]
