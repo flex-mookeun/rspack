@@ -43,8 +43,6 @@ type BlockChunks = BTreeMap<String, Vec<ChunkId>>;
 /// runs serially (each compiler owns its plugin instance and drives one
 /// compilation at a time). The content_hash tap runs concurrently across
 /// chunks, so `collected_css_hashes` uses a `Mutex` instead.
-/// `hot_update_module_additions` is written before and after rendering each
-/// hot-update chunk; parallel render hooks only borrow it immutably.
 #[plugin]
 #[derive(Debug)]
 pub struct HotModuleReplacementPlugin {
@@ -57,13 +55,11 @@ pub struct HotModuleReplacementPlugin {
   // the previous sealed build's per-chunk css digests: the old side of the
   // diff, advanced on every build like `CompilationRecords`
   previous_css_hashes: AtomicRefCell<ChunkIdMap<ChunkCssHashes>>,
-  // Unchanged factories included only to supply missing dependencies during HMR.
-  hot_update_module_additions: AtomicRefCell<Option<(ChunkUkey, IdentifierSet)>>,
 }
 
 impl Default for HotModuleReplacementPlugin {
   fn default() -> Self {
-    Self::new_inner(Default::default(), Default::default(), Default::default())
+    Self::new_inner(Default::default(), Default::default())
   }
 }
 
@@ -81,6 +77,43 @@ impl ChunkCssHashes {
   fn is_empty(&self) -> bool {
     self.css.is_none() && self.mini_css.is_none()
   }
+}
+
+fn is_module_unchanged(compilation: &Compilation, chunk: &Chunk, module: ModuleIdentifier) -> bool {
+  let Some(records) = &compilation.records else {
+    return false;
+  };
+  let Some(module_id) = ChunkGraph::get_module_id(&compilation.module_ids_artifact, module) else {
+    return false;
+  };
+  let Some(old_hashes) = records.modules.get(module_id) else {
+    return false;
+  };
+  let chunk_id = chunk.expect_id();
+  let new_hash = compilation
+    .code_generation_results
+    .get_hash(&module, Some(chunk.runtime()));
+  // Overlapping runtimes can have different factories. Keep the same-chunk
+  // baseline when its runtime is unchanged, and search other chunks only otherwise.
+  if let Some(old_hash) = old_hashes.get(chunk_id).filter(|_| {
+    records
+      .chunks
+      .get(chunk_id)
+      .is_some_and(|(runtime, _)| runtime == chunk.runtime())
+  }) {
+    return Some(old_hash) == new_hash;
+  }
+  let mut previous = old_hashes
+    .iter()
+    .filter(|(id, _)| {
+      records.chunks.get(*id).is_some_and(|(runtimes, _)| {
+        runtimes
+          .iter()
+          .any(|runtime| records.runtimes.contains(runtime) && chunk.runtime().contains(runtime))
+      })
+    })
+    .peekable();
+  previous.peek().is_some() && previous.all(|(_, hash)| Some(hash) == new_hash)
 }
 
 #[plugin_hook(CompilerCompilation for HotModuleReplacementPlugin)]
@@ -124,12 +157,23 @@ async fn render_module_container(
   _init_fragments: &mut ChunkInitFragments,
   _runtime_template: &RuntimeCodeTemplate,
 ) -> Result<()> {
-  if !self
-    .hot_update_module_additions
-    .borrow()
-    .as_ref()
-    .is_some_and(|(chunk, modules)| chunk == chunk_ukey && modules.contains(&module.identifier()))
-  {
+  let graph = &compilation.build_chunk_graph_artifact;
+  let chunk = graph.chunk_by_ukey.expect_get(chunk_ukey);
+  if chunk.kind() != ChunkKind::HotUpdate {
+    return Ok(());
+  }
+  // Factories forwarded through their old chunk remain ordinary updates.
+  let Some(current_chunk) = graph
+    .chunk_graph
+    .get_module_chunks(module.identifier())
+    .iter()
+    .map(|ukey| graph.chunk_by_ukey.expect_get(ukey))
+    .find(|current| current.kind() != ChunkKind::HotUpdate && current.id() == chunk.id())
+  else {
+    return Ok(());
+  };
+  // Selected unchanged factories only supply missing dependencies during HMR.
+  if !is_module_unchanged(compilation, current_chunk, module.identifier()) {
     return Ok(());
   }
 
@@ -382,7 +426,6 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
     let previous_groups = previous_chunks.get(chunk_id);
     let was_in_all_groups =
       previous_groups.is_none_or(|groups| groups.iter().all(|chunks| chunks.contains(chunk_id)));
-    let mut install_only = IdentifierSet::default();
     let mut new_modules = vec![];
     let mut new_runtime_modules = vec![];
     let new_runtime: RuntimeSpec;
@@ -423,33 +466,12 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
         .iter()
         .filter_map(|&module| {
           let module_id = ChunkGraph::get_module_id(&compilation.module_ids_artifact, module)?;
-          let Some(old_module_hashes) = old_all_modules.get(module_id) else {
-            return Some(module);
-          };
-          let new_hash = compilation
-            .code_generation_results
-            .get_hash(&module, Some(current_chunk.runtime()));
-          // Overlapping runtimes can have different factories. Keep the same-chunk
-          // baseline when its runtime is unchanged, and search other chunks only otherwise.
-          let unchanged = if let Some(old_hash) = old_module_hashes
-            .get(chunk_id)
-            .filter(|_| old_runtime == current_chunk.runtime())
-          {
-            Some(old_hash) == new_hash
-          } else {
-            let mut previous = old_module_hashes
-              .iter()
-              .filter(|(id, _)| {
-                old_chunks.get(*id).is_some_and(|(runtimes, _)| {
-                  runtimes.iter().any(|runtime| new_runtime.contains(runtime))
-                })
-              })
-              .peekable();
-            previous.peek().is_some() && previous.all(|(_, hash)| Some(hash) == new_hash)
-          };
-          if !unchanged {
+          if !is_module_unchanged(compilation, current_chunk, module) {
             return Some(module);
           }
+          let old_module_hashes = old_all_modules
+            .get(module_id)
+            .expect("unchanged module should have recorded hashes");
           if was_in_all_groups && old_module_hashes.contains_key(chunk_id) {
             return None;
           }
@@ -458,7 +480,6 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
               .iter()
               .any(|chunks| chunks.iter().all(|id| !old_module_hashes.contains_key(id)))
           }) {
-            install_only.insert(module);
             return Some(module);
           }
           None
@@ -622,15 +643,12 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
 
       let mut manifest = Vec::new();
       let mut diagnostics = Vec::new();
-      *self.hot_update_module_additions.borrow_mut() = Some((ukey, install_only));
-      let render_result = compilation
+      compilation
         .plugin_driver
         .compilation_hooks
         .render_manifest
         .call(compilation, &ukey, &mut manifest, &mut diagnostics)
-        .await;
-      self.hot_update_module_additions.borrow_mut().take();
-      render_result?;
+        .await?;
 
       // Manually clean up ChunkGraph and chunks
       for module_identifier in new_modules {
