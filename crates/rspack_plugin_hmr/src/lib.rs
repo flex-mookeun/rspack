@@ -320,18 +320,6 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
       )
     })
     .collect::<HashMap<_, _>>();
-  let old_blocks = old_runtime_modules
-    .values()
-    .filter_map(|record| {
-      record
-        .update_data
-        .as_deref()?
-        .as_any()
-        .downcast_ref::<BlockChunkMapData>()
-    })
-    .flat_map(|data| data.0.iter().map(|(id, entry)| (id.as_str(), entry)))
-    .collect::<HashMap<_, _>>();
-
   // Keep the old loading groups for each chunk. Module records already index
   // their previous chunks, so missing dependencies can be checked during diffing.
   let mut previous_chunks: ChunkIdMap<HashSet<&[ChunkId]>> = Default::default();
@@ -348,18 +336,32 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
       collect_previous_chunks(chunks, previous.as_slice());
     }
   }
-  for (runtime, blocks) in &current_blocks {
-    for (block_id, entry) in blocks {
-      if let Some(previous) = old_blocks.get(block_id.as_str())
-        && old_all_modules.get(&previous.parent).is_some_and(|chunks| {
-          chunks.keys().any(|id| {
-            old_chunks
-              .get(id)
-              .is_some_and(|(runtimes, _)| runtimes.contains(runtime))
-          })
-        })
-      {
-        collect_previous_chunks(&entry.chunks, previous.chunks.as_slice());
+  // Match the complete runtime module identifier to keep old block maps separate.
+  for (identifier, record) in old_runtime_modules {
+    let Some(previous) = record
+      .update_data
+      .as_deref()
+      .and_then(|data| data.as_any().downcast_ref::<BlockChunkMapData>())
+    else {
+      continue;
+    };
+    let Some(current) = compilation
+      .runtime_modules
+      .get(identifier)
+      .and_then(|module| module.get_update_data(compilation))
+    else {
+      continue;
+    };
+    let Some(current) = current
+      .as_ref()
+      .as_any()
+      .downcast_ref::<BlockChunkMapData>()
+    else {
+      continue;
+    };
+    for (block_id, chunks) in &current.0 {
+      if let Some(previous) = previous.0.get(block_id) {
+        collect_previous_chunks(chunks, previous.as_slice());
       }
     }
   }
@@ -726,9 +728,8 @@ async fn process_assets(&self, compilation: &mut Compilation) -> Result<()> {
     }
   }
   for (runtime, info) in &mut hot_update_main_content_by_runtime {
-    for (block_id, entry) in &current_blocks[runtime] {
-      let needed: Vec<_> = entry
-        .chunks
+    for (block_id, chunks) in &current_blocks[runtime] {
+      let needed: Vec<_> = chunks
         .iter()
         .filter(|id| info.updated_chunk_ids.contains(*id))
         .cloned()
