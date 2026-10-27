@@ -7,7 +7,7 @@
 - Bundle: bundle.js
 - Bundle: chunk1_js.chunk.CURRENT_HASH.js
 - Bundle: chunk2_js.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 660
+- Manifest: main.LAST_HASH.hot-update.json, size: 684
 - Update: chunk1_js.LAST_HASH.hot-update.js, size: 273
 - Update: chunk2_js.LAST_HASH.hot-update.js, size: 273
 - Update: main.LAST_HASH.hot-update.js, size: 181
@@ -17,7 +17,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["chunk1_js","chunk2_js","main"],"r":[],"m":[],"load":{"blocks":{"./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk1.js|modifier=./chunk1.js":["chunk1_js"],"./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk1|modifier=./chunk1":["chunk1_js"],"./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk2.js|modifier=./chunk2.js":["chunk2_js"],"./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk2|modifier=./chunk2":["chunk2_js"]}}}
+{"c":["chunk1_js","chunk2_js","main"],"r":[],"m":[],"load":{"blocks":{"block:./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk1.js|modifier=./chunk1.js":["chunk1_js"],"block:./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk1|modifier=./chunk1":["chunk1_js"],"block:./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk2.js|modifier=./chunk2.js":["chunk2_js"],"block:./.|lazy|/^\\.\\/chunk.*$/|groupOptions: {}|namespace object|importPhase: evaluation|dep=context|./.|./chunk2|modifier=./chunk2":["chunk2_js"]}}}
 ```
 
 

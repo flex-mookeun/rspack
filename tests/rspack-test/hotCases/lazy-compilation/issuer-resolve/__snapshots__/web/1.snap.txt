@@ -8,17 +8,17 @@
 - Bundle: data_issuer_txt.chunk.CURRENT_HASH.js
 - Bundle: data_issuer_txt_lazy-compilation-proxy.chunk.CURRENT_HASH.js
 - Bundle: data_resolve_txt_lazy-compilation-proxy.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 348
+- Manifest: main.LAST_HASH.hot-update.json, size: 360
 - Update: data_issuer_txt.LAST_HASH.hot-update.js, size: 126
-- Update: data_issuer_txt_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1028
-- Update: main.LAST_HASH.hot-update.js, size: 951
+- Update: data_issuer_txt_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1034
+- Update: main.LAST_HASH.hot-update.js, size: 957
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["data_issuer_txt","data_issuer_txt_lazy-compilation-proxy","main"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./data/issuer.txt|loc=7:18-45":["data_issuer_txt_lazy-compilation-proxy"],"./data/issuer.txt!lazy-compilation-proxy":["data_issuer_txt"]}}}
+{"c":["data_issuer_txt","data_issuer_txt_lazy-compilation-proxy","main"],"r":[],"m":[],"load":{"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./data/issuer.txt|loc=7:18-45":["data_issuer_txt_lazy-compilation-proxy"],"block:./data/issuer.txt!lazy-compilation-proxy":["data_issuer_txt"]}}}
 ```
 
 
@@ -61,7 +61,7 @@ self["rspackHotUpdate"]("data_issuer_txt_lazy-compilation-proxy", {
 "./data/issuer.txt!lazy-compilation-proxy"(module, __unused_rspack_exports, __webpack_require__) {
 var client = __webpack_require__("../../../../../../../../packages/rspack/hot/lazy-compilation-web.js?http%3A%2F%2Flocalhost%3APORT%2F_rspack%2Flazy%2Ftrigger");
 var data = "lazy-compilation-proxy|asset/source|<TEST_ROOT>/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/issuer-resolve/data/issuer.txt";
-        module.exports = __webpack_require__.eg("./data/issuer.txt!lazy-compilation-proxy").then(__webpack_require__.t.bind(__webpack_require__, "./data/issuer.txt", 17));
+        module.exports = __webpack_require__.eg("block:./data/issuer.txt!lazy-compilation-proxy").then(__webpack_require__.t.bind(__webpack_require__, "./data/issuer.txt", 17));
         if (module.hot) {
           module.hot.accept();
           module.hot.accept("./data/issuer.txt", function() { module.hot.invalidate(); });
@@ -119,7 +119,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"./data/issuer.txt!lazy-compilation-proxy":["data_issuer_txt"]});
+})({"block:./data/issuer.txt!lazy-compilation-proxy":["data_issuer_txt"]});
 
 })();
 

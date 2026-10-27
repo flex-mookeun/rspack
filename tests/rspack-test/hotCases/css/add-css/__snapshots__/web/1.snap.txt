@@ -6,7 +6,7 @@
 ## Asset Files
 - Bundle: bundle.js
 - Bundle: lazy.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 209
+- Manifest: main.LAST_HASH.hot-update.json, size: 97
 - Update: lazy.LAST_HASH.hot-update.js, size: 334
 - Update: main.LAST_HASH.hot-update.js, size: 7286
 
@@ -15,7 +15,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["lazy","main"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./lazy|loc=10:8-55":["lazy"]}},"css":{"c":["lazy"]}}
+{"c":["lazy","main"],"r":[],"m":[],"load":{"blocks":{"name:lazy":["lazy"]}},"css":{"c":["lazy"]}}
 ```
 
 

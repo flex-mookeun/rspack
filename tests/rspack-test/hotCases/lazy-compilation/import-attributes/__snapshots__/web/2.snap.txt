@@ -9,17 +9,17 @@
 - Bundle: data_a_json_lazy-compilation-proxy.chunk.CURRENT_HASH.js
 - Bundle: data_b_json.chunk.CURRENT_HASH.js
 - Bundle: data_b_json_lazy-compilation-proxy.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 408
+- Manifest: main.LAST_HASH.hot-update.json, size: 420
 - Update: data_b_json.LAST_HASH.hot-update.js, size: 120
-- Update: data_b_json_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1050
-- Update: main.LAST_HASH.hot-update.js, size: 943
+- Update: data_b_json_lazy-compilation-proxy.LAST_HASH.hot-update.js, size: 1056
+- Update: main.LAST_HASH.hot-update.js, size: 949
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["data_b_json","data_b_json_lazy-compilation-proxy","main"],"r":[],"m":[],"load":{"blocks":{"./data/b.json!lazy-compilation-proxy":["data_b_json"],"./data|lazy|/^\\.\\/.*\\.json$/|referencedExports: |groupOptions: {}|namespace object|importAttributes: {\"type\":\"json\"}|importPhase: evaluation|dep=context|./data|./b.json{\"type\":\"json\"}|modifier=./b.json":["data_b_json_lazy-compilation-proxy"]}}}
+{"c":["data_b_json","data_b_json_lazy-compilation-proxy","main"],"r":[],"m":[],"load":{"blocks":{"block:./data/b.json!lazy-compilation-proxy":["data_b_json"],"block:./data|lazy|/^\\.\\/.*\\.json$/|referencedExports: |groupOptions: {}|namespace object|importAttributes: {\"type\":\"json\"}|importPhase: evaluation|dep=context|./data|./b.json{\"type\":\"json\"}|modifier=./b.json":["data_b_json_lazy-compilation-proxy"]}}}
 ```
 
 
@@ -62,7 +62,7 @@ self["rspackHotUpdate"]("data_b_json_lazy-compilation-proxy", {
 "./data/b.json!lazy-compilation-proxy"(module, __unused_rspack_exports, __webpack_require__) {
 var client = __webpack_require__("../../../../../../../../packages/rspack/hot/lazy-compilation-web.js?http%3A%2F%2Flocalhost%3APORT%2F_rspack%2Flazy%2Ftrigger");
 var data = "lazy-compilation-proxy|json|<TEST_TOOLS_ROOT>/dist/helper/hot-update/loader.js!<TEST_ROOT>/js/temp/hot-snapshot/hotSnapshotCases-hotCases/lazy-compilation/import-attributes/data/b.json";
-        module.exports = __webpack_require__.eg("./data/b.json!lazy-compilation-proxy").then(__webpack_require__.t.bind(__webpack_require__, "./data/b.json", 19));
+        module.exports = __webpack_require__.eg("block:./data/b.json!lazy-compilation-proxy").then(__webpack_require__.t.bind(__webpack_require__, "./data/b.json", 19));
         if (module.hot) {
           module.hot.accept();
           module.hot.accept("./data/b.json", function() { module.hot.invalidate(); });
@@ -120,7 +120,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"./data/b.json!lazy-compilation-proxy":["data_b_json"]});
+})({"block:./data/b.json!lazy-compilation-proxy":["data_b_json"]});
 
 })();
 

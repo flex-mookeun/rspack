@@ -8,16 +8,16 @@
 ## Asset Files
 - Bundle: b_js.CURRENT_HASH.js
 - Bundle: bundle.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 200
+- Manifest: main.LAST_HASH.hot-update.json, size: 206
 - Update: b_js.LAST_HASH.hot-update.js, size: 341
-- Update: main.LAST_HASH.hot-update.js, size: 1348
+- Update: main.LAST_HASH.hot-update.js, size: 1366
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["b_js","main"],"r":["a_js"],"m":["./a.js"],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./b|loc=1:16-29":["b_js"]}}}
+{"c":["b_js","main"],"r":["a_js"],"m":["./a.js"],"load":{"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./b|loc=1:16-29":["b_js"]}}}
 ```
 
 
@@ -69,7 +69,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
   "default": () => (__rspack_default_export)
 });
-/* export default */ const __rspack_default_export = (__webpack_require__.eg("../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./b|loc=1:16-29").then(__webpack_require__.bind(__webpack_require__, "./b.js")));
+/* export default */ const __rspack_default_export = (__webpack_require__.eg("block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./b|loc=1:16-29").then(__webpack_require__.bind(__webpack_require__, "./b.js")));
 
 
 },
@@ -92,7 +92,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./a|loc=1:16-29":null,"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./b|loc=1:16-29":["b_js"]});
+})({"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./a|loc=1:16-29":null,"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./b|loc=1:16-29":["b_js"]});
 
 })();
 

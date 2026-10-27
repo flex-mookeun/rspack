@@ -6,7 +6,7 @@
 ## Asset Files
 - Bundle: bundle.js
 - Bundle: style_module_css.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 415
+- Manifest: main.LAST_HASH.hot-update.json, size: 427
 - Update: main.LAST_HASH.hot-update.js, size: 181
 - Update: style_module_css.LAST_HASH.hot-update.js, size: 589
 
@@ -15,7 +15,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["main","style_module_css"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./style.module.css|loc=10:17-80":["style_module_css"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./style.module.css|loc=3:21-84":["style_module_css"]}},"css":{"c":["style_module_css"]}}
+{"c":["main","style_module_css"],"r":[],"m":[],"load":{"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./style.module.css|loc=10:17-80":["style_module_css"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./style.module.css|loc=3:21-84":["style_module_css"]}},"css":{"c":["style_module_css"]}}
 ```
 
 

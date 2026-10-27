@@ -8,17 +8,17 @@
 - Bundle: async/initial_js.js
 - Bundle: lib.CURRENT_HASH.js
 - Bundle: main.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 241
+- Manifest: main.LAST_HASH.hot-update.json, size: 247
 - Update: initial_js.LAST_HASH.hot-update.js, size: 332
 - Update: lib.LAST_HASH.hot-update.js, size: 1375
-- Update: main.LAST_HASH.hot-update.js, size: 27049
+- Update: main.LAST_HASH.hot-update.js, size: 27067
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["initial_js","lib","main"],"r":[],"m":[],"load":{"entries":{"main":["lib"]},"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27":["lib","initial_js"]}}}
+{"c":["initial_js","lib","main"],"r":[],"m":[],"load":{"entries":{"main":["lib"]},"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27":["lib","initial_js"]}}}
 ```
 
 
@@ -102,7 +102,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 it("should work if there are new initial chunks", async () => {
-	await __webpack_require__.eg("../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27").then(__webpack_require__.bind(__webpack_require__, "./initial.js"));
+	await __webpack_require__.eg("block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27").then(__webpack_require__.bind(__webpack_require__, "./initial.js"));
 	expect(
 		globalThis.__INITIAL_CHUNK_HMR_CHUNKS__.some(([chunkIds]) =>
 			chunkIds.includes("lib")
@@ -167,7 +167,7 @@ __webpack_require__.O = (result, chunkIds, fn, priority) => {
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27":["lib","initial_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=5:16-35":null});
+})({"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=4:8-27":["lib","initial_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./initial|loc=5:16-35":null});
 
 })();
 // webpack/runtime/css_loading

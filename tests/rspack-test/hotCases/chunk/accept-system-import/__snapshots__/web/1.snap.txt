@@ -7,7 +7,7 @@
 - Bundle: bundle.js
 - Bundle: chunk2_js.chunk.CURRENT_HASH.js
 - Bundle: chunk_js.chunk.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 628
+- Manifest: main.LAST_HASH.hot-update.json, size: 652
 - Update: chunk2_js.LAST_HASH.hot-update.js, size: 273
 - Update: chunk_js.LAST_HASH.hot-update.js, size: 272
 - Update: main.LAST_HASH.hot-update.js, size: 181
@@ -17,7 +17,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["chunk2_js","chunk_js","main"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk2|loc=11:17-35":["chunk2_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk2|loc=6:21-39":["chunk2_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=4:20-37":["chunk_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=9:16-33":["chunk_js"]}}}
+{"c":["chunk2_js","chunk_js","main"],"r":[],"m":[],"load":{"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk2|loc=11:17-35":["chunk2_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk2|loc=6:21-39":["chunk2_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=4:20-37":["chunk_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=9:16-33":["chunk_js"]}}}
 ```
 
 

@@ -7,17 +7,17 @@
 ## Asset Files
 - Bundle: 10.chunk.CURRENT_HASH.js
 - Bundle: bundle.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 206
+- Manifest: main.LAST_HASH.hot-update.json, size: 89
 - Update: 10.LAST_HASH.hot-update.js, size: 597
 - Update: 1e1.LAST_HASH.hot-update.js, size: 269
-- Update: main.LAST_HASH.hot-update.js, size: 1369
+- Update: main.LAST_HASH.hot-update.js, size: 1020
 
 ## Manifest
 
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":[10,"1e1","main"],"r":["1e1"],"m":["./chunk.js"],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./chunk2|loc=1:22-69":[10]}}}
+{"c":[10,"1e1","main"],"r":["1e1"],"m":["./chunk.js"],"load":{"blocks":{"name:10":[10]}}}
 ```
 
 
@@ -109,7 +109,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
   "default": () => (__rspack_default_export)
 });
-/* export default */ const __rspack_default_export = (() => __webpack_require__.eg("../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./chunk2|loc=1:22-69").then(__webpack_require__.bind(__webpack_require__, "./chunk2.js")));
+/* export default */ const __rspack_default_export = (() => __webpack_require__.eg("name:10").then(__webpack_require__.bind(__webpack_require__, "./chunk2.js")));
 
 
 },
@@ -132,7 +132,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./chunk2|loc=1:22-69":[10],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./module.js|dep=esm|./chunk|loc=1:22-69":null});
+})({"name:10":[10],"name:1e1":null});
 
 })();
 

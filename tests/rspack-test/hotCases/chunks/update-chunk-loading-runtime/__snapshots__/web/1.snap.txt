@@ -10,10 +10,10 @@
 - Bundle: main.js
 - Bundle: runtime~main.js
 - Bundle: vendors-node_modules_vendor_js.js
-- Manifest: runtime~main.LAST_HASH.hot-update.json, size: 314
+- Manifest: runtime~main.LAST_HASH.hot-update.json, size: 320
 - Update: chunk_js.LAST_HASH.hot-update.js, size: 339
-- Update: main.LAST_HASH.hot-update.js, size: 760
-- Update: runtime~main.LAST_HASH.hot-update.js, size: 1120
+- Update: main.LAST_HASH.hot-update.js, size: 766
+- Update: runtime~main.LAST_HASH.hot-update.js, size: 1126
 - Update: vendors-node_modules_vendor_js.LAST_HASH.hot-update.js, size: 374
 
 ## Manifest
@@ -21,7 +21,7 @@
 ### runtime~main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["chunk_js","main","runtime~main","vendors-node_modules_vendor_js"],"r":[],"m":[],"load":{"entries":{"main":["runtime~main","vendors-node_modules_vendor_js"]},"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=3:47-64":["chunk_js"]}}}
+{"c":["chunk_js","main","runtime~main","vendors-node_modules_vendor_js"],"r":[],"m":[],"load":{"entries":{"main":["runtime~main","vendors-node_modules_vendor_js"]},"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=3:47-64":["chunk_js"]}}}
 ```
 
 
@@ -72,7 +72,7 @@ __webpack_require__.r(__webpack_exports__);
 /* import */ var vendor__rspack_import_0 = __webpack_require__("./node_modules/vendor.js");
 
 module.hot.data.ok = true;
-module.hot.data.loadChunk = () => __webpack_require__.eg("../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=3:47-64").then(__webpack_require__.bind(__webpack_require__, "./chunk.js"));
+module.hot.data.loadChunk = () => __webpack_require__.eg("block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=3:47-64").then(__webpack_require__.bind(__webpack_require__, "./chunk.js"));
 globalThis.__UPDATE_CHUNK_LOADING_RUNTIME_DATA__ = module.hot.data;
 module.hot.data.test = () => {
 	expect(vendor__rspack_import_0["default"]).toBe(2);
@@ -128,7 +128,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=3:47-64":["chunk_js"]});
+})({"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=3:47-64":["chunk_js"]});
 
 })();
 

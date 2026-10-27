@@ -11,20 +11,20 @@
 - Bundle: shared.chunk.CURRENT_HASH.js
 - Bundle: workerA_js.chunk.CURRENT_HASH.js
 - Bundle: workerB_js.chunk.CURRENT_HASH.js
-- Manifest: [runtime of workerA_js].LAST_HASH.hot-update.json, size: 241
-- Manifest: [runtime of workerB_js].LAST_HASH.hot-update.json, size: 252
+- Manifest: [runtime of workerA_js].LAST_HASH.hot-update.json, size: 125
+- Manifest: [runtime of workerB_js].LAST_HASH.hot-update.json, size: 136
 - Manifest: main.LAST_HASH.hot-update.json, size: 54
 - Update: main.LAST_HASH.hot-update.js, size: 181
 - Update: shared.LAST_HASH.hot-update.js, size: 624
-- Update: workerA_js.LAST_HASH.hot-update.js, size: 1025
-- Update: workerB_js.LAST_HASH.hot-update.js, size: 1157
+- Update: workerA_js.LAST_HASH.hot-update.js, size: 1031
+- Update: workerB_js.LAST_HASH.hot-update.js, size: 1169
 
 ## Manifest
 
 ### [runtime of workerA_js].LAST_HASH.hot-update.json
 
 ```json
-{"c":["shared","workerA_js"],"r":["chunkS_js"],"m":["./chunk.js","./chunkS.js"],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./workerA.js|dep=esm|./moduleAs|loc=3:14-67":["shared"]}}}
+{"c":["shared","workerA_js"],"r":["chunkS_js"],"m":["./chunk.js","./chunkS.js"],"load":{"blocks":{"name:shared":["shared"]}}}
 ```
 
 
@@ -32,7 +32,7 @@
 ### [runtime of workerB_js].LAST_HASH.hot-update.json
 
 ```json
-{"c":["shared","workerB_js"],"r":["chunkS_js","chunk_js"],"m":["./chunk.js","./chunkS.js"],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./workerB.js|dep=esm|./moduleBs|loc=3:14-67":["shared"]}}}
+{"c":["shared","workerB_js"],"r":["chunkS_js","chunk_js"],"m":["./chunk.js","./chunkS.js"],"load":{"blocks":{"name:shared":["shared"]}}}
 ```
 
 
@@ -148,7 +148,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./moduleBs.js|dep=esm|./chunkS|loc=2:24-42":null});
+})({"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./moduleBs.js|dep=esm|./chunkS|loc=2:24-42":null});
 
 })();
 
@@ -199,7 +199,7 @@ __webpack_require__.h = () => ("CURRENT_HASH")
 	Object.keys(installedBlocks).forEach((id) => {
 		if (!map[id]) delete installedBlocks[id];
 	});
-})({"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./moduleB.js|dep=esm|./chunk|loc=2:24-41":null,"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./moduleBs.js|dep=esm|./chunkS|loc=2:24-42":null});
+})({"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./moduleB.js|dep=esm|./chunk|loc=2:24-41":null,"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./moduleBs.js|dep=esm|./chunkS|loc=2:24-42":null});
 
 })();
 

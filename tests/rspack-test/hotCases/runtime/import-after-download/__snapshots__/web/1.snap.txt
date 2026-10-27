@@ -8,7 +8,7 @@
 - Bundle: bundle.js
 - Bundle: chunk_js.CURRENT_HASH.js
 - Bundle: unaffected-chunk_js.CURRENT_HASH.js
-- Manifest: main.LAST_HASH.hot-update.json, size: 196
+- Manifest: main.LAST_HASH.hot-update.json, size: 202
 - Update: chunk_js.LAST_HASH.hot-update.js, size: 339
 - Update: main.LAST_HASH.hot-update.js, size: 464
 
@@ -17,7 +17,7 @@
 ### main.LAST_HASH.hot-update.json
 
 ```json
-{"c":["chunk_js","main"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=6:3-20":["chunk_js"]}}}
+{"c":["chunk_js","main"],"r":[],"m":[],"load":{"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./chunk|loc=6:3-20":["chunk_js"]}}}
 ```
 
 

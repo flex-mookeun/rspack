@@ -168,19 +168,29 @@ pub struct AsyncDependenciesBlock {
 }
 
 impl AsyncDependenciesBlock {
-  /// Use the module ID for an anonymous block, otherwise keep the block identifier.
+  /// Named groups keep their loading key when an import moves in the source.
   pub fn runtime_id(&self, compilation: &Compilation) -> String {
+    let graph = &compilation.build_chunk_graph_artifact;
+    if let Some(name) = graph
+      .chunk_graph
+      .get_block_chunk_group(&self.id, &graph.chunk_group_by_ukey)
+      .and_then(|group| group.kind.get_normal_options())
+      .and_then(|options| options.name.as_deref())
+    {
+      return format!("name:{name}");
+    }
     // Generated modules such as lazy compilation proxies have one anonymous block.
     // Its parent module ID already distinguishes loaders, types and layers.
     if self.id.0.as_str().get(self.parent.len()..) == Some("|dep=")
       && let Some(id) = ChunkGraph::get_module_id(&compilation.module_ids_artifact, self.parent)
     {
-      return id.to_string();
+      return format!("block:{id}");
     }
-    rspack_util::identifier::make_paths_relative(
+    let id = rspack_util::identifier::make_paths_relative(
       compilation.options.context.as_str(),
       self.id.0.as_str(),
-    )
+    );
+    format!("block:{id}")
   }
 
   /// modifier should be Dependency.span in most of time

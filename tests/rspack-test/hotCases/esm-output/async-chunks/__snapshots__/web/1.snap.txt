@@ -8,7 +8,7 @@
 - Bundle: async-module_js.chunk.mjs
 - Bundle: lazy-module_js.chunk.mjs
 - Bundle: main.mjs
-- Manifest: main.LAST_HASH.hot-update.json.mjs, size: 854
+- Manifest: main.LAST_HASH.hot-update.json.mjs, size: 884
 - Update: async-module_js.LAST_HASH.hot-update.mjs, size: 347
 - Update: lazy-module_js.LAST_HASH.hot-update.mjs, size: 346
 - Update: main.LAST_HASH.hot-update.mjs, size: 249
@@ -18,7 +18,7 @@
 ### main.LAST_HASH.hot-update.json.mjs
 
 ```json
-{"c":["async-module_js","lazy-module_js","main"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./async-module|loc=14:3-27":["async-module_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./async-module|loc=23:23-47":["async-module_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./async-module|loc=6:3-27":["async-module_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./lazy-module|loc=15:3-26":["lazy-module_js"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./lazy-module|loc=7:3-26":["lazy-module_js"]}}}
+{"c":["async-module_js","lazy-module_js","main"],"r":[],"m":[],"load":{"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./async-module|loc=14:3-27":["async-module_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./async-module|loc=23:23-47":["async-module_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./async-module|loc=6:3-27":["async-module_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./lazy-module|loc=15:3-26":["lazy-module_js"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./lazy-module|loc=7:3-26":["lazy-module_js"]}}}
 ```
 
 

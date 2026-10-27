@@ -8,7 +8,7 @@
 - Bundle: common.chunk.mjs
 - Bundle: main.mjs
 - Bundle: vendor.chunk.mjs
-- Manifest: main.LAST_HASH.hot-update.json.mjs, size: 646
+- Manifest: main.LAST_HASH.hot-update.json.mjs, size: 670
 - Update: common.LAST_HASH.hot-update.mjs, size: 482
 - Update: main.LAST_HASH.hot-update.mjs, size: 249
 - Update: vendor.LAST_HASH.hot-update.mjs, size: 503
@@ -18,7 +18,7 @@
 ### main.LAST_HASH.hot-update.json.mjs
 
 ```json
-{"c":["common","main","vendor"],"r":[],"m":[],"load":{"blocks":{"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./common/shared|loc=13:3-28":["common"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./common/shared|loc=5:3-28":["common"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|vendor-lib|loc=14:3-23":["vendor"],"../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|vendor-lib|loc=6:3-23":["vendor"]}}}
+{"c":["common","main","vendor"],"r":[],"m":[],"load":{"blocks":{"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./common/shared|loc=13:3-28":["common"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|./common/shared|loc=5:3-28":["common"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|vendor-lib|loc=14:3-23":["vendor"],"block:../../../../../../../../packages/rspack-test-tools/dist/helper/hot-update/loader.js!./index.js|dep=esm|vendor-lib|loc=6:3-23":["vendor"]}}}
 ```
 
 
