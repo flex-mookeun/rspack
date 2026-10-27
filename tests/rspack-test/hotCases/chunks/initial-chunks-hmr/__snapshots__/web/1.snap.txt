@@ -11,7 +11,7 @@
 - Manifest: main.LAST_HASH.hot-update.json, size: 241
 - Update: initial_js.LAST_HASH.hot-update.js, size: 332
 - Update: lib.LAST_HASH.hot-update.js, size: 1375
-- Update: main.LAST_HASH.hot-update.js, size: 26832
+- Update: main.LAST_HASH.hot-update.js, size: 27049
 
 ## Manifest
 
@@ -422,7 +422,10 @@ function jsonpLoadUpdateChunk(chunkId, updatedModulesList) {
 self["rspackHotUpdate"] = (chunkId, moreModules, runtime) => {
 	for (var moduleId in moreModules) {
 		if (__webpack_require__.o(moreModules, moduleId)) {
-			hotCurrentUpdate[moduleId] = moreModules[moduleId];
+			// Install-only factories must not replace ordinary updates.
+			if (!Array.isArray(moreModules[moduleId]) || !__webpack_require__.o(hotCurrentUpdate, moduleId) || Array.isArray(hotCurrentUpdate[moduleId])) {
+				hotCurrentUpdate[moduleId] = moreModules[moduleId];
+			}
 			if (hotCurrentUpdatedModulesList) hotCurrentUpdatedModulesList.push(moduleId);
 		}
 	}

@@ -7,7 +7,7 @@
 - Bundle: bundle.js
 - Bundle: common_js_2.chunk.CURRENT_HASH.js
 - Manifest: main.LAST_HASH.hot-update.json, size: 278
-- Update: main.LAST_HASH.hot-update.js, size: 42584
+- Update: main.LAST_HASH.hot-update.js, size: 42801
 - Update: webpack_sharing_consume_default_common2_common_2.LAST_HASH.hot-update.js, size: 94
 
 ## Manifest
@@ -737,7 +737,10 @@ function jsonpLoadUpdateChunk(chunkId, updatedModulesList) {
 self["rspackHotUpdate"] = (chunkId, moreModules, runtime) => {
 	for (var moduleId in moreModules) {
 		if (__webpack_require__.o(moreModules, moduleId)) {
-			hotCurrentUpdate[moduleId] = moreModules[moduleId];
+			// Install-only factories must not replace ordinary updates.
+			if (!Array.isArray(moreModules[moduleId]) || !__webpack_require__.o(hotCurrentUpdate, moduleId) || Array.isArray(hotCurrentUpdate[moduleId])) {
+				hotCurrentUpdate[moduleId] = moreModules[moduleId];
+			}
 			if (hotCurrentUpdatedModulesList) hotCurrentUpdatedModulesList.push(moduleId);
 		}
 	}
